@@ -1,0 +1,144 @@
+<html>
+<head>
+<title>Cable Network Companies</title>
+
+<!--<BODY>
+<noscript>
+</BODY>  -->
+
+<script>
+
+function generateHTML(xmlDoc)
+   {  
+        inner_elements=xmlDoc.getElementsByTagName("Row");
+            
+       ELEMENT_NODE = 1;  
+      if (xmlDoc.documentElement.nodeName=="parsererror")
+      {
+      alert(xmlDoc.documentElement.childNodes[0].nodeValue);
+      return(null);
+      } 
+      if(inner_elements.length==0)
+            {
+            	alert("Error:No cable network Companies");
+            	return(null);
+            }
+      
+      else
+      {// MS parser doesn't define Node.ELEMENT_NODE
+           root=xmlDoc.DocumentElement;
+           html_text="<html><head><title>XML Parse Result</title></head><body>";
+           html_text+="<table border='2'>";
+       // caption=xmlDoc.getElementsByTagName("title").item(0).firstChild.nodeValue;
+          // html_text+="<caption align='left'><h1>"+caption+"</h1></caption>";
+           headers=xmlDoc.getElementsByTagName("Data");
+   
+           
+           html_text+="<tbody>";
+           html_text+="<tr>";
+           x=0;  y=0;
+	   // output the headers
+           for(i=0;i<headers.length;i++)
+           {  if(headers.item(i).nodeType==ELEMENT_NODE)
+			   {  
+			   	header=headers.item(i).firstChild.nodeValue;
+				   
+			html_text+="<th>"+header+"</th>";  }   }
+           html_text+="</tr>";
+          
+             for(i=0;i<inner_elements.length;i++) //do for all planes
+           {  
+           	planeNodeList=inner_elements.item(i).childNodes; //get properties of a plane
+               html_text+="<tr>";      //start a new row of the output table
+               for(j=0;j<planeNodeList.length;j++)
+               { 
+               	if(planeNodeList.item(j).nodeType==ELEMENT_NODE)
+			        {
+			if(planeNodeList.item(j).nodeName=="Logo")
+				{//handle images separately
+			html_text+="<td><img src='"+planeNodeList.item(j).firstChild.nodeValue+"'></td>";  }
+			else if(planeNodeList.item(j).nodeName=="Feeds")
+			{
+				
+				
+				feedchilds=planeNodeList.item(j).children;
+				
+			
+				/*allfeeds=planeNodeList.item(j).childNodes;
+				html_text+="<td>"+allfeeds.length+"</td>"; */
+				
+				html_text+="<td><ul>";
+				for(k=0;k<feedchilds.length;k++)
+
+				{
+					html_text+="<li>"+feedchilds.item(k).firstChild.nodeValue+"</li>"; 
+					
+				}
+				html_text+="</ul></td>";
+			}
+			else if(planeNodeList.item(j).nodeName=="HomePage")
+			{
+				
+				html_text+="<td><a href='"+planeNodeList.item(j).firstChild.nodeValue+"'>"+planeNodeList.item(j).firstChild.nodeValue+"</a></td>"; 
+			}
+			
+		else {
+html_text+="<td>"+planeNodeList.item(j).firstChild.nodeValue+"</td>";
+		}   }    }
+               html_text+="</tr>";  }
+
+html_text+="</tbody>";  
+html_text+="</table>";
+           html_text+="</body></html>";  
+}
+}
+function viewXML(what)
+{
+   
+    var URL = what.URL.value;
+    if(URL == '')
+    {
+    	alert("No URL mentioned");
+    	return null;
+    }
+  function loadXML(url) {
+      
+      if (window.XMLHttpRequest)
+  {// code for IE7+, Firefox, Chrome, Opera, Safari
+     
+       xmlhttp=new XMLHttpRequest(); 
+       
+  }
+ else {// code for IE6, IE5
+    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");  }
+  xmlhttp.open("GET",url,false);
+  
+  xmlhttp.send();
+  if(xmlhttp.status==404)
+  {
+  	alert("File Not Found");
+  }
+  xmlDoc=xmlhttp.responseXML;
+  return xmlDoc; 
+  }
+  xmlDoc = loadXML(URL);
+    
+  //else if FF, execute script once XML object has loaded
+  xmlDoc.onload=generateHTML(xmlDoc);
+    hWin = window.open("", "Assignment4", "scrollbars=yes", "height=1200,width=800");
+    hWin.document.write(html_text);  
+ hWin.document.close();  
+ }
+ </script>
+ </head>
+<body>
+
+<form name="myform" method="POST" id="location">
+<input type="text" name="URL" maxlength="255" size="100"/>
+<br />
+<br/>
+<input type="button" name="submit" value="Submit Query" onClick="viewXML(this.form)" />
+</form>
+<noscript>
+</body>
+</html>
